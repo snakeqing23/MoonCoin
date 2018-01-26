@@ -22,3 +22,7 @@
 hs_err_pid*
 
 .idea
+
+src/test/resources/application.properties
+
+target
