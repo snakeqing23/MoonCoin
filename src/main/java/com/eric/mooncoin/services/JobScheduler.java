@@ -25,6 +25,14 @@ public class JobScheduler {
     }
 
     public <T> Optional<T> startJob(IJob<T> job) {
+        return startJob(job, 0);
+    }
+
+    private <T> Optional<T> startJob(IJob<T> job, int currentInterval) {
+        if (currentInterval > job.retryTime()) {
+            return Optional.empty();
+        }
+
         jobLimitState.computeIfAbsent(job.jobClass(), k -> new LinkedBlockingQueue<Long>(job.maxJobCount()));
         long currentJobId = System.currentTimeMillis();
         boolean[] canRun = {true};
@@ -48,7 +56,10 @@ public class JobScheduler {
         if (canRun[0]) {
             return Optional.of(job.run());
         } else {
-            return Optional.empty();
+            int retryTime = ++currentInterval;
+            System.out.println("retry job " + retryTime);
+            // TODO, retry in a delayed time, using executorService
+            return startJob(job, retryTime);
         }
     }
 

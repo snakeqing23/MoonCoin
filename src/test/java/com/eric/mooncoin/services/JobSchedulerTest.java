@@ -2,6 +2,9 @@ package com.eric.mooncoin.services;
 
 import org.junit.Test;
 
+import java.util.Optional;
+import java.util.stream.IntStream;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,8 +15,19 @@ public class JobSchedulerTest {
 
     @Test
     public void testStartJob() throws Exception {
-        for (int i = 0; i < 100; i++) {
-            scheduler.startJob(new SampleJob());
-        }
+        long count = IntStream.range(0, 100)
+                .mapToObj(i -> scheduler.startJob(new SampleJob()))
+                .filter(Optional::isPresent)
+                .count();
+        assertEquals(5, count);
+    }
+
+    @Test
+    public void testStartRetryJob() throws Exception {
+        long count = IntStream.range(0, 100)
+                .mapToObj(i -> scheduler.startJob(new SampleRetryJob()))
+                .filter(Optional::isPresent)
+                .count();
+        assertEquals(100, count);
     }
 }

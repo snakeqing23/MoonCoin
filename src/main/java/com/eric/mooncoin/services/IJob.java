@@ -8,6 +8,10 @@ public interface IJob<T> {
 
     int jobWindow();
 
+    default int retryTime() {
+        return 0;
+    }
+
     T run();
 
     default String jobClass() {
